@@ -13,20 +13,47 @@ Print the information:
 - time of last modification and time of last status change
 '''
 
-import os, subprocess
+import os, datetime
 
-filepath = input("Enter the absolute path of a file you wish to check: ")
+filepath = input("Enter the path of a file you wish to check: ")
 info = os.stat(filepath)
-inode1 = subprocess.run(['ls', '-il', filepath], stdout=subprocess.PIPE)
-inode2 = subprocess.run(['awk', '{print $1}'], stdin=inode1.stdout)
 
+def secondsToDate(seconds):
+    convertedDate = datetime.datetime.fromtimestamp(seconds).strftime("%A, %B %d, %Y, %H:%M:%S")
+    return convertedDate
 
+access_seconds = info.st_atime
+mod_seconds = info.st_mtime
+meta_seconds = info.st_ctime
+
+print()
 print(f"ID of device containing file: {info.st_dev}")
-print(f"inode number: {inode2}")
-# print(f"protection: {}")
-# print(f"number of hard links: {}")
-# print(f"user ID of owner: {}")
-# print(f"group ID of owner: {}")
-# print(f"total size (in bytes): {}")
-# print(f"time of last access: {}")
-# print(f"time of last modification and time of last status change: {}")
+print(f"inode number: {info.st_ino}")
+print(f"protection: {info.st_mode}")
+print(f"number of hard links: {os.stat(filepath).st_nlink}")
+print(f"user ID of owner: {info.st_uid}")
+print(f"group ID of owner: {info.st_gid}")
+print(f"total size (in bytes): {info.st_size}")
+print(f"time of last access: {secondsToDate(access_seconds)}")
+print(f"time of last modification: {secondsToDate(mod_seconds)}")
+print(f"time of last status change: {secondsToDate(meta_seconds)}")
+
+
+'''
+Sample Code:
+
+path = 'e:\\testpath\\p.txt'
+fd = os.open(path, os.O_RDWR)
+info = os.fstat(fd)
+print (f"ID of device containing file: {info.st_dev}")
+print (f"Inode number: {info.st_ino}")
+print (f"Protection: {info.st_mode}")
+print (f"Number of hard links: {info.st_nlink}")
+print (f"User ID of owner: {info.st_uid}")
+print (f"Group ID of owner: {info.st_gid}")
+print (f"Total size, in bytes: {info.st_size}")
+print (f"Time of last access: {info.st_atime}")
+print (f"Time of last modification: {info.st_mtime }")
+print (f"Time of last status change: {info.st_ctime }")
+os.close( fd)
+'''
